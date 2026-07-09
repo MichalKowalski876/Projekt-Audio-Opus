@@ -13,7 +13,7 @@ def save_clients(data):
         json.dump(data, file, indent=4)
 
 
-def client_add():
+def client_add(): # old
     name = input("Podaj nazwę: ")
     cut = input("Podaj część: ")
 
@@ -27,8 +27,17 @@ def client_add():
     save_clients(data)
     print("Klient został dodany.")
 
+def client_add(name: str, cut: str):
+    data = load_clients()
 
-def client_delete():
+    data.append({
+        "name": name,
+        "cut": cut
+    })
+
+    save_clients(data)
+
+def client_delete(): # old
     name = input("Podaj nazwę: ")
 
     data = load_clients()
@@ -42,8 +51,15 @@ def client_delete():
 
     print("Nie znaleziono klienta.")
 
+def client_delete(name: str):
+    data = load_clients()
+    for client in data:
+        if client["name"] == name:
+            data.remove(client)
+            save_clients(data)
 
-def client_modify():
+
+def client_modify(): # old
     name = input("Podaj nazwę klienta do modyfikacji: ")
 
     data = load_clients()
@@ -58,6 +74,17 @@ def client_modify():
             return
 
     print("Nie znaleziono klienta.")
+
+def client_modify(name: str, field: str, new_value: str):
+    data = load_clients()
+
+    for client in data:
+        if client["name"] == name:
+            client[field] = new_value
+            save_clients(data)
+            return
+
+
 
 
 def client_show():
