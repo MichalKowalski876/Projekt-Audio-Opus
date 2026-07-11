@@ -1,4 +1,4 @@
-import client_db
+import database_controller
 import sys
 from PySide6.QtWidgets import QApplication
 

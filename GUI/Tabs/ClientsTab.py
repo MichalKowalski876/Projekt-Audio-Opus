@@ -1,21 +1,22 @@
 from PySide6 import QtWidgets, QtCore
 
-import client_db
+import database_controller
 
 
 class ClientsTab(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
 
-        self.selected_client_name = None
+        self.client_id = None
         self.data = None
+
         self.label = QtWidgets.QLabel("clients", self)
         self.clients_table = QtWidgets.QTableWidget()
         self.clients_table.setFixedSize(315, 400);
 
         self.clients_table.setColumnCount(3)
         self.clients_table.setHorizontalHeaderLabels([
-            "ID",
+            "Id",
             "Name",
             "Cut"
         ])
@@ -54,51 +55,48 @@ class ClientsTab(QtWidgets.QWidget):
         button.clicked.connect(dialog.accept)
 
         if dialog.exec():
-            name = name_input.text()
-            cut = cut_input.text()
+            client = {
+                "name": name_input.text(),
+                "cut": cut_input.text()
+            }
 
-            client_db.client_add(name, cut)
+            database_controller.item_add(client, "clients")
             self.refresh_table()
 
     def remove_client_button(self):
-        name, ok = QtWidgets.QInputDialog.getText(
+        id, ok = QtWidgets.QInputDialog.getText(
             self,
             "Usuń klienta",
-            "Podaj nazwę:"
+            "Podaj id:"
         )
 
         if ok:
-            client_db.client_delete(name)
+            database_controller.item_remove(int(id), "clients")
             self.refresh_table()
 
     def on_item_changed(self, item):
-        if item.column() == 1:
-            field = "name"
+        column_id = self.clients_table.item(item.row(),0)
+        field = self.clients_table.horizontalHeaderItem(item.column())
 
-        elif item.column() == 2:
-            field = "cut"
-
-        else:
-            return
-
-        client_db.client_modify(
-            self.selected_client_name,
-            field,
-            item.text()
+        database_controller.item_modify(
+            int(column_id.text()),
+            field.text().lower(),
+            item.text(),
+            "clients"
         )
 
-    def on_client_clicked(self, row, column):
-        self.selected_client_name = self.clients_table.item(row, 1).text()
+    def on_client_clicked(self, row):
+        self.client_id = self.clients_table.item(row, 0).text()
 
     def refresh_table(self):
-        self.data = client_db.load_clients()
+        self.data = database_controller.load_database()
 
         self.clients_table.setRowCount(len(self.data))
 
         for row, client in enumerate(self.data):
             self.clients_table.setItem(
                 row, 0,
-                QtWidgets.QTableWidgetItem(str(row + 1))
+                QtWidgets.QTableWidgetItem(str(client["id"]))
             )
             self.clients_table.setItem(
                 row, 1,

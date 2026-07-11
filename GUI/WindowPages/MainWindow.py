@@ -2,6 +2,7 @@ from PySide6 import QtWidgets, QtCore
 from PySide6 import QtWidgets
 
 from GUI.Tabs.ClientsTab import ClientsTab
+from GUI.Tabs.StreamingTab import StreamingTab
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -14,5 +15,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.tabs = QtWidgets.QTabWidget()
 
         self.tabs.addTab(ClientsTab(), "Clients")
+        self.tabs.addTab(StreamingTab(), "Streaming")
 
         self.setCentralWidget(self.tabs)
