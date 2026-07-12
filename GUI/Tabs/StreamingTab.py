@@ -23,7 +23,7 @@ class StreamingTab(QtWidgets.QWidget):
             ["Id", "Name", "Cut"],
             "streamings",
             {"name": KNOWN_STREAMINGS},
-            field_types={"cut":float}
+            field_types={"cut": float}
         )
 
         self.settlement_button = QtWidgets.QPushButton("Nowe rozliczenie (PDF)")

@@ -18,7 +18,7 @@ class CrudTable(QtWidgets.QWidget):
         self.table = Table(table_header, database_name)
 
         self.add_button = AddButton(
-            table_header[1:],          
+            table_header[1:],
             database_name,
             self.table.refresh_table,
             suggestions,
