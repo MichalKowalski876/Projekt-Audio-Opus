@@ -40,14 +40,7 @@ def generate_streamings_report():
 
 
 def generate_settlement_pdf(client, items):
-    """
-    client - słownik klienta (z polem "cut" = prowizja Audio Opus w %)
-    items  - lista słowników: {"platform": <słownik platformy>, "revenue": <wypłata od platformy>}
-
-    Kwota "revenue" to wypłata otrzymana od platformy, czyli prowizja
-    platformy jest już odjęta - w raporcie pokazujemy ją tylko informacyjnie.
-    Dzielimy więc wypłatę wyłącznie między klienta i Audio Opus.
-    """
+  
     os.makedirs(FOLDER, exist_ok=True)
 
     now = datetime.now()
