@@ -1,4 +1,6 @@
-from PySide6 import QtWidgets
+from wsgiref.validate import validator
+
+from PySide6 import QtWidgets, QtGui
 
 import database_controller
 
@@ -9,7 +11,8 @@ class AddButton(QtWidgets.QPushButton):
             fields: list[str],
             database_name: str,
             refresh_callback,
-            suggestions: dict[str, list[str]] = None
+            suggestions: dict[str, list[str]] = None,
+            field_types: dict[str, type] = None
     ):
         super().__init__(f"Add {database_name}")
 
@@ -17,6 +20,7 @@ class AddButton(QtWidgets.QPushButton):
         self.database_name = database_name
         self.refresh_callback = refresh_callback
         self.suggestions = suggestions or {}
+        self.field_types = field_types or {}
 
         self.clicked.connect(self.add_item_button)
 
@@ -26,6 +30,15 @@ class AddButton(QtWidgets.QPushButton):
         if not options:
             line = QtWidgets.QLineEdit()
             line.setPlaceholderText(field.capitalize())
+
+            field_type = self.field_types.get(field.lower())
+            if field_type is int:
+                line.setValidator(QtGui.QIntValidator())
+            elif field_type is float:
+                validator = QtGui.QDoubleValidator()
+                validator.setDecimals(2)
+                line.setValidator(validator)
+
             return line
 
         combo = QtWidgets.QComboBox()

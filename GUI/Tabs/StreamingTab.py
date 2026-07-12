@@ -22,7 +22,8 @@ class StreamingTab(QtWidgets.QWidget):
         self.crudTable = CrudTable(
             ["Id", "Name", "Cut"],
             "streamings",
-            {"name": KNOWN_STREAMINGS}
+            {"name": KNOWN_STREAMINGS},
+            field_types={"cut": float}
         )
 
         self.settlement_button = QtWidgets.QPushButton("Nowe rozliczenie (PDF)")

@@ -1,22 +1,17 @@
 [
     {
-        "name": "edit",
-        "cut": "adwawdawd",
+        "name": "test1",
+        "cut": "12",
+        "id": 1
+    },
+    {
+        "name": "test2",
+        "cut": "32",
         "id": 2
     },
     {
-        "name": "awddawawdad",
-        "cut": "waddawawd",
+        "name": "test3",
+        "cut": "2",
         "id": 3
-    },
-    {
-        "name": "adwwdaawd",
-        "cut": "wadawdawd",
-        "id": 4
-    },
-    {
-        "name": "ddadwad",
-        "cut": "awdwad",
-        "id": 5
     }
 ]
