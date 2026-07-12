@@ -1,5 +1,7 @@
 from PySide6 import QtWidgets, QtCore
 
+from GUI.Widgets.CrudTable.NumericDelegate import NumericDelegate
+
 import database_controller
 
 
@@ -20,6 +22,10 @@ class Table(QtWidgets.QWidget):
 
         self.table.setColumnCount(len(self.table_header))
         self.table.setHorizontalHeaderLabels(self.table_header)
+
+        if "Cut" in self.table_header:
+            column = self.table_header.index("Cut")
+            self.table.setItemDelegateForColumn(column, NumericDelegate(float, self.table))
 
         self.refresh_table()
 
