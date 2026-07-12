@@ -6,7 +6,12 @@ from GUI.Widgets.CrudTable.Table import Table
 
 
 class CrudTable(QtWidgets.QWidget):
-    def __init__(self, table_header: list[str], database_name: str):
+    def __init__(
+            self,
+            table_header: list[str],
+            database_name: str,
+            suggestions: dict[str, list[str]] = None
+    ):
         super().__init__()
 
         self.table = Table(table_header, database_name)
@@ -14,7 +19,8 @@ class CrudTable(QtWidgets.QWidget):
         self.add_button = AddButton(
             table_header[1:],          # bez ID
             database_name,
-            self.table.refresh_table
+            self.table.refresh_table,
+            suggestions
         )
 
         self.remove_button = RemoveButton(
