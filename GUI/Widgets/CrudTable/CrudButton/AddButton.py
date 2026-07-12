@@ -4,14 +4,43 @@ import database_controller
 
 
 class AddButton(QtWidgets.QPushButton):
-    def __init__(self, fields: list[str], database_name: str, refresh_callback):
+    def __init__(
+            self,
+            fields: list[str],
+            database_name: str,
+            refresh_callback,
+            suggestions: dict[str, list[str]] = None
+    ):
         super().__init__(f"Add {database_name}")
 
         self.fields = fields
         self.database_name = database_name
         self.refresh_callback = refresh_callback
+        self.suggestions = suggestions or {}
 
         self.clicked.connect(self.add_item_button)
+
+    def create_input(self, field: str):
+        options = self.suggestions.get(field.lower())
+
+        if not options:
+            line = QtWidgets.QLineEdit()
+            line.setPlaceholderText(field.capitalize())
+            return line
+
+        combo = QtWidgets.QComboBox()
+        combo.setEditable(True)
+        combo.addItems(options)
+        combo.setCurrentText("")
+        combo.lineEdit().setPlaceholderText(field.capitalize())
+
+        return combo
+
+    def read_input(self, widget):
+        if isinstance(widget, QtWidgets.QComboBox):
+            return widget.currentText().strip()
+
+        return widget.text()
 
     def add_item_button(self):
         dialog = QtWidgets.QDialog(self)
@@ -20,11 +49,10 @@ class AddButton(QtWidgets.QPushButton):
         inputs = {}
 
         for field in self.fields:
-            line = QtWidgets.QLineEdit()
-            line.setPlaceholderText(field.capitalize())
+            widget = self.create_input(field)
 
-            layout.addWidget(line)
-            inputs[field.lower()] = line
+            layout.addWidget(widget)
+            inputs[field.lower()] = widget
 
         button = QtWidgets.QPushButton("Dodaj")
         layout.addWidget(button)
@@ -34,8 +62,8 @@ class AddButton(QtWidgets.QPushButton):
         if dialog.exec():
             item = {}
 
-            for key, line in inputs.items():
-                item[key] = line.text()
+            for key, widget in inputs.items():
+                item[key] = self.read_input(widget)
 
             database_controller.item_add(item, self.database_name)
             self.refresh_callback()
