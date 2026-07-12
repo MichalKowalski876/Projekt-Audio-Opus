@@ -10,7 +10,8 @@ class CrudTable(QtWidgets.QWidget):
             self,
             table_header: list[str],
             database_name: str,
-            suggestions: dict[str, list[str]] = None
+            suggestions: dict[str, list[str]] = None,
+            field_types: dict[str, type] = None,
     ):
         super().__init__()
 
@@ -20,7 +21,8 @@ class CrudTable(QtWidgets.QWidget):
             table_header[1:],          
             database_name,
             self.table.refresh_table,
-            suggestions
+            suggestions,
+            field_types
         )
 
         self.remove_button = RemoveButton(

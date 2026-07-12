@@ -1,7 +1,12 @@
 [
     {
-        "name": "bbbb",
-        "price": "bbbbb",
+        "name": "Legimi",
+        "cut": "12",
         "id": 1
+    },
+    {
+        "name": "Spotify",
+        "cut": "32",
+        "id": 2
     }
 ]
