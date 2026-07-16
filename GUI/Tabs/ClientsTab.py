@@ -6,7 +6,9 @@ class ClientsTab(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
 
-        self.crudTable = CrudTable(["Id", "Name", "Cut"], "clients", field_types={"cut":float})
+        self.clientTable = CrudTable(["Id", "Name", "Cut"], "clients", field_types={"cut":float})
+        self.productTable = CrudTable(["Id", "Name"], "products")
 
         layout = QtWidgets.QHBoxLayout(self)
-        layout.addWidget(self.crudTable)
+        layout.addWidget(self.clientTable)
+        layout.addWidget(self.productTable)

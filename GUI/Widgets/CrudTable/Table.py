@@ -1,5 +1,7 @@
 from PySide6 import QtWidgets, QtCore
 
+from PySide6.QtWidgets import QHeaderView
+
 from GUI.Widgets.CrudTable.NumericDelegate import NumericDelegate
 
 import database_controller
@@ -28,6 +30,11 @@ class Table(QtWidgets.QWidget):
             self.table.setItemDelegateForColumn(column, NumericDelegate(float, self.table))
 
         self.refresh_table()
+
+        if self.database_name == "products":
+            header = self.table.horizontalHeader()
+            header.setSectionResizeMode(0, QHeaderView.ResizeToContents)  # Id
+            header.setSectionResizeMode(1, QHeaderView.Stretch)  # Name
 
         self.table.itemChanged.connect(self.on_item_changed)
         self.table.cellClicked.connect(self.on_item_clicked)
