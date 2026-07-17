@@ -1,4 +1,4 @@
-from PySide6 import QtWidgets
+from PySide6 import QtWidgets, QtCore
 
 from GUI.Widgets.CrudList.List import List
 
@@ -10,6 +10,7 @@ class CrudList(QtWidgets.QWidget):
         self.list = List(database_name)
 
         self.details = QtWidgets.QWidget()
+        self.details.setFixedWidth(300)
 
         details_layout = QtWidgets.QFormLayout(self.details)
 
@@ -29,6 +30,11 @@ class CrudList(QtWidgets.QWidget):
         layout = QtWidgets.QHBoxLayout(self)
         layout.addLayout(left_layout)
         layout.addWidget(self.details)
+
+        layout.setAlignment(
+            self.details,
+            QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignTop
+        )
 
     def show_details(self, data):
         self.id_label.setText(str(data["id"]))

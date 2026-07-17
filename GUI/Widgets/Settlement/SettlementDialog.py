@@ -6,10 +6,8 @@ import report_generator
 
 class SettlementDialog(QtWidgets.QDialog):
     """Dialog rozliczeniowy:
-
     wybór klienta -> produkt + platforma + wypłata -> raport PDF.
     """
-
     def __init__(self, parent=None):
         super().__init__(parent)
 
