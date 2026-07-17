@@ -21,8 +21,12 @@ class AddButton(QtWidgets.QPushButton):
         self.refresh_callback = refresh_callback
         self.suggestions = suggestions or {}
         self.field_types = field_types or {}
+        self.extra_data = {}
 
         self.clicked.connect(self.add_item_button)
+
+    def set_extra_data(self, extra_data: dict):
+        self.extra_data = extra_data
 
     def create_input(self, field: str):
         options = self.suggestions.get(field.lower())
@@ -77,6 +81,10 @@ class AddButton(QtWidgets.QPushButton):
 
             for key, widget in inputs.items():
                 item[key] = self.read_input(widget)
+
+                for key, widget in inputs.items():
+
+                    item[key] = self.read_input(widget)
 
             database_controller.item_add(item, self.database_name)
             self.refresh_callback()

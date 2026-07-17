@@ -1,6 +1,12 @@
 [
     {
         "id": 1,
-        "name": "test"
+        "name": "test",
+        "client_id": 1
+    },
+    {
+        "id": 2,
+        "name": "ksi\u0105\u017cka",
+        "client_id": 2
     }
 ]

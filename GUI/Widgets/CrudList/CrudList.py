@@ -17,10 +17,12 @@ class CrudList(QtWidgets.QWidget):
         self.id_label = QtWidgets.QLabel("-")
         self.name_edit = QtWidgets.QLineEdit()
         self.cut_edit = QtWidgets.QLineEdit()
+        self.email_edit = QtWidgets.QLineEdit()
 
         details_layout.addRow("Id:", self.id_label)
         details_layout.addRow("Name:", self.name_edit)
         details_layout.addRow("Cut:", self.cut_edit)
+        details_layout.addRow("Email:", self.email_edit)
 
         self.list.selected.connect(self.show_details)
 
@@ -40,3 +42,4 @@ class CrudList(QtWidgets.QWidget):
         self.id_label.setText(str(data["id"]))
         self.name_edit.setText(data["name"])
         self.cut_edit.setText(str(data["cut"]))
+        self.email_edit.setText(data.get("email", ""))

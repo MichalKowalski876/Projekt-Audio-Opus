@@ -16,6 +16,7 @@ class Table(QtWidgets.QWidget):
 
         self.data = []
         self.item_id = None
+        self.client_id = None
 
         self.label = QtWidgets.QLabel(database_name.capitalize())
 
@@ -40,6 +41,10 @@ class Table(QtWidgets.QWidget):
         self.table.cellClicked.connect(self.on_item_clicked)
 
         self.setup_layout()
+    def set_client_id(self, client_id: int):
+        self.client_id = client_id
+        self.item_id = None
+        self.refresh_table()
 
     def on_item_changed(self, item):
         column_id = self.table.item(item.row(), 0)
@@ -58,8 +63,17 @@ class Table(QtWidgets.QWidget):
     def refresh_table(self):
         self.data = database_controller.load_database(self.database_name)
 
-        self.table.blockSignals(True)
+        if self.database_name == "products":
+            if self.client_id is None:
+                self.data = []
+            else:
+                self.data = [
+                    item
+                    for item in self.data
+                    if item.get("client_id") == self.client_id
+                ]
 
+        self.table.blockSignals(True)
         self.table.setRowCount(len(self.data))
 
         for row, item in enumerate(self.data):
