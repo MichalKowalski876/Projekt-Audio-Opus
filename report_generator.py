@@ -40,7 +40,6 @@ def generate_streamings_report():
 
 
 def generate_settlement_pdf(client, items):
-  
     os.makedirs(FOLDER, exist_ok=True)
 
     now = datetime.now()
@@ -55,6 +54,7 @@ def generate_settlement_pdf(client, items):
     total_client = 0.0
 
     for item in items:
+        product = item["product"]
         platform = item["platform"]
         revenue = float(item["revenue"])
         platform_cut = float(platform["cut"])
@@ -67,13 +67,14 @@ def generate_settlement_pdf(client, items):
         total_client += for_client
 
         rows += (
-            "<tr>"
-            "<td>" + str(platform["name"]) + "</td>"
-            "<td align='center'>" + f"{platform_cut:.0f}" + "%</td>"
-            "<td align='right'>" + f"{revenue:.2f}" + " zł</td>"
-            "<td align='right'>" + f"{company_cut:.0f}" + "% (" + f"{company_fee:.2f}" + " zł)</td>"
-            "<td align='right'><b>" + f"{for_client:.2f}" + " zł</b></td>"
-            "</tr>"
+                "<tr>"
+                "<td>" + str(product["name"]) + "</td>"
+                "<td>" + str(platform["name"]) + "</td>"
+                "<td align='center'>" + f"{platform_cut:.0f}" + "%</td>"
+                "<td align='right'>" + f"{revenue:.2f}" + " zł</td>"
+                "<td align='right'>" + f"{company_cut:.0f}" + "% (" + f"{company_fee:.2f}" + " zł)</td>"
+                                                                                                                                                                                                                                                        "<td align='right'><b>" + f"{for_client:.2f}" + " zł</b></td>"
+                                                                                                                                                                                                                                                                                                        "</tr>"
         )
 
     html = """
@@ -85,6 +86,7 @@ def generate_settlement_pdf(client, items):
 
     <table border='1' cellspacing='0' cellpadding='6' width='100%'>
         <tr bgcolor='#dddddd'>
+            <th>Produkt</th> <!-- DODANE: Nagłówek produktu -->
             <th>Platforma</th>
             <th>Prowizja platformy</th>
             <th>Wypłata od platformy</th>
@@ -93,7 +95,7 @@ def generate_settlement_pdf(client, items):
         </tr>
         """ + rows + """
         <tr bgcolor='#eeeeee'>
-            <td><b>RAZEM</b></td>
+            <td colspan='2'><b>RAZEM</b></td> <!-- ZMIENIONE: colspan='2', żeby wyrównać układ kolumn -->
             <td></td>
             <td align='right'><b>""" + f"{total_revenue:.2f}" + """ zł</b></td>
             <td align='right'><b>""" + f"{total_company_fee:.2f}" + """ zł</b></td>

@@ -1,13 +1,13 @@
-from PySide6 import QtWidgets, QtCore
+from PySide6 import QtWidgets
 
 import database_controller
 import report_generator
 
 
 class SettlementDialog(QtWidgets.QDialog):
-    """
-    Dialog rozliczeniowy:
-    wybór klienta -> wybór platform + wpisanie przychodu -> raport PDF.
+    """Dialog rozliczeniowy:
+
+    wybór klienta -> produkt + platforma + wypłata -> raport PDF.
     """
 
     def __init__(self, parent=None):
@@ -18,45 +18,26 @@ class SettlementDialog(QtWidgets.QDialog):
 
         self.clients = database_controller.load_database("clients")
         self.streamings = database_controller.load_database("streamings")
+        self.products = database_controller.load_database("products")
 
         self.client_box = QtWidgets.QComboBox()
+
         for client in self.clients:
             self.client_box.addItem(
-                str(client["name"]) + " (prowizja " + str(client["cut"]) + "%)",
+                f"{client['name']} (prowizja {client['cut']}%)",
                 client["id"]
             )
 
         self.table = QtWidgets.QTableWidget()
-        self.table.setColumnCount(4)
+        self.table.setColumnCount(3)
         self.table.setHorizontalHeaderLabels([
-            "",
+            "Produkt",
             "Platforma",
-            "Prowizja platformy",
             "Wypłata (zł)"
         ])
+        self.table.setRowCount(1)
+        self.add_empty_row(0)
 
-        self.table.setRowCount(len(self.streamings))
-
-        for row, streaming in enumerate(self.streamings):
-            check = QtWidgets.QTableWidgetItem()
-            check.setFlags(
-                QtCore.Qt.ItemFlag.ItemIsUserCheckable
-                | QtCore.Qt.ItemFlag.ItemIsEnabled
-            )
-            check.setCheckState(QtCore.Qt.CheckState.Unchecked)
-            self.table.setItem(row, 0, check)
-
-            name = QtWidgets.QTableWidgetItem(str(streaming["name"]))
-            name.setFlags(QtCore.Qt.ItemFlag.ItemIsEnabled)
-            self.table.setItem(row, 1, name)
-
-            cut = QtWidgets.QTableWidgetItem(str(streaming["cut"]) + "%")
-            cut.setFlags(QtCore.Qt.ItemFlag.ItemIsEnabled)
-            self.table.setItem(row, 2, cut)
-
-            self.table.setItem(row, 3, QtWidgets.QTableWidgetItem("0"))
-
-        self.table.setColumnWidth(0, 30)
         self.table.horizontalHeader().setStretchLastSection(True)
 
         self.generate_button = QtWidgets.QPushButton("Generuj raport PDF")
@@ -64,24 +45,74 @@ class SettlementDialog(QtWidgets.QDialog):
 
         self.setup_layout()
 
+    def add_empty_row(self, row):
+        product_box = QtWidgets.QComboBox()
+        product_box.addItem("")
+
+        for product in self.products:
+            product_box.addItem(str(product["name"]), product["id"])
+
+        platform_box = QtWidgets.QComboBox()
+        platform_box.addItem("")
+
+        for streaming in self.streamings:
+            platform_box.addItem(str(streaming["name"]), streaming["id"])
+
+        self.table.setCellWidget(row, 0, product_box)
+        self.table.setCellWidget(row, 1, platform_box)
+        self.table.setItem(row, 2, QtWidgets.QTableWidgetItem("0"))
+
+        product_box.currentIndexChanged.connect(
+            lambda _, r=row: self.check_new_row(r)
+        )
+        platform_box.currentIndexChanged.connect(
+            lambda _, r=row: self.check_new_row(r)
+        )
+
+    def check_new_row(self, row):
+        if row != self.table.rowCount() - 1:
+            return
+
+        product = self.table.cellWidget(row, 0)
+        platform = self.table.cellWidget(row, 1)
+
+        if (
+                product
+                and platform
+                and product.currentIndex() > 0
+                and platform.currentIndex() > 0
+        ):
+            new_row = self.table.rowCount()
+            self.table.insertRow(new_row)
+            self.add_empty_row(new_row)
+
     def collect_items(self):
         items = []
 
-        for row, streaming in enumerate(self.streamings):
-            if self.table.item(row, 0).checkState() != QtCore.Qt.CheckState.Checked:
+        for row in range(self.table.rowCount()):
+            product_box = self.table.cellWidget(row, 0)
+            platform_box = self.table.cellWidget(row, 1)
+
+            if not product_box or product_box.currentIndex() == 0:
                 continue
 
-            revenue_text = self.table.item(row, 3).text().replace(",", ".").strip()
+            table_item = self.table.item(row, 2)
+            revenue_text = (
+                table_item.text().replace(",", ".").strip()
+                if table_item else "0"
+            )
 
             try:
                 revenue = float(revenue_text)
             except ValueError:
-                raise ValueError(
-                    "Niepoprawna wypłata dla platformy: " + str(streaming["name"])
-                )
+                raise ValueError("Niepoprawna kwota wypłaty.")
+
+            product = database_controller.item_get(product_box.currentData(), "products")
+            platform = database_controller.item_get(platform_box.currentData(), "streamings")
 
             items.append({
-                "platform": streaming,
+                "product": product,
+                "platform": platform,
                 "revenue": revenue
             })
 
@@ -92,10 +123,7 @@ class SettlementDialog(QtWidgets.QDialog):
             QtWidgets.QMessageBox.warning(self, "Uwaga", "Brak klientów w bazie.")
             return
 
-        client = database_controller.item_get(
-            self.client_box.currentData(),
-            "clients"
-        )
+        client = database_controller.item_get(self.client_box.currentData(), "clients")
 
         try:
             items = self.collect_items()
@@ -104,29 +132,16 @@ class SettlementDialog(QtWidgets.QDialog):
             return
 
         if not items:
-            QtWidgets.QMessageBox.warning(
-                self,
-                "Uwaga",
-                "Zaznacz przynajmniej jedną platformę."
-            )
+            QtWidgets.QMessageBox.warning(self, "Uwaga", "Dodaj przynajmniej jeden produkt.")
             return
 
         try:
             file_path = report_generator.generate_settlement_pdf(client, items)
         except ValueError:
-            QtWidgets.QMessageBox.warning(
-                self,
-                "Uwaga",
-                "Prowizja klienta i platformy musi być liczbą."
-            )
+            QtWidgets.QMessageBox.warning(self, "Uwaga", "Prowizja klienta i platformy musi być liczbą.")
             return
 
-        QtWidgets.QMessageBox.information(
-            self,
-            "Gotowe",
-            "Zapisano raport:\n" + file_path
-        )
-
+        QtWidgets.QMessageBox.information(self, "Gotowe", f"Zapisano raport:\n{file_path}")
         self.accept()
 
     def setup_layout(self):
@@ -134,10 +149,8 @@ class SettlementDialog(QtWidgets.QDialog):
 
         layout.addWidget(QtWidgets.QLabel("Klient:"))
         layout.addWidget(self.client_box)
-
-        layout.addWidget(QtWidgets.QLabel(
-            "Zaznacz platformy i wpisz wypłatę od każdej z nich:"
-        ))
+        layout.addWidget(
+            QtWidgets.QLabel("Wybierz produkt, platformę i wpisz wypłatę:")
+        )
         layout.addWidget(self.table)
-
         layout.addWidget(self.generate_button)
