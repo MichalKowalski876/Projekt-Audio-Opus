@@ -1,15 +1,63 @@
 import os
 import smtplib
+import json
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-def send_report_email(receiver_email, attachment_path):
-    SMTP_SERVER = "smtp.gmail.com"  #<---- przykladowo gmail
-    SMTP_PORT = 465 
+SMTP_CONFIG_FILE = "smtp_config.json"
+MSG_CONFIG_FILE = "msg_config.json"
 
-    SENDER_EMAIL = "audioopus@gmail.com"  #<----- przykładowy adres email, pozniej zostanie zmieniony 
-    SENDER_PASSWORD = "          " #<----- haslo do aplikacji, pozniej zostanie dodane
+
+def load_smtp_config():
+    if os.path.exists(SMTP_CONFIG_FILE):
+        try:
+            with open(SMTP_CONFIG_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"Błąd ładowania konfiguracji SMTP: {e}")
+
+    return {
+        "SMTP_SERVER": "smtp.gmail.com",
+        "SMTP_PORT": 465,
+        "SENDER_EMAIL": "",
+        "SENDER_PASSWORD": ""
+    }
+
+def load_msg_config():
+    if os.path.exists(MSG_CONFIG_FILE):
+        try:
+            with open(MSG_CONFIG_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"Błąd ładowania konfiguracji wiadomości: {e}")
+
+    return {
+        "EMAIL_SUBJECT": "Zbiorczy raport rozliczeniowy Audio Opus",
+        "EMAIL_BODY": "Dzień dobry,\n\nW załączniku znajduje się aktualny raport rozliczeniowy wygenerowany przez system Audio Opus."
+    }
+
+
+def send_report_email(receiver_email, attachment_path):
+    smtp_config = load_smtp_config()
+    msg_config = load_msg_config()
+
+    SMTP_SERVER = smtp_config.get("SMTP_SERVER", "smtp.gmail.com")
+
+    try:
+        SMTP_PORT = int(smtp_config.get("SMTP_PORT", 465))
+    except ValueError:
+        SMTP_PORT = 465
+
+    SENDER_EMAIL = smtp_config.get("SENDER_EMAIL", "")
+    SENDER_PASSWORD = smtp_config.get("SENDER_PASSWORD", "")
+
+    EMAIL_SUBJECT = msg_config.get("EMAIL_SUBJECT", "Zbiorczy raport rozliczeniowy Audio Opus")
+    EMAIL_BODY_RAW = msg_config.get("EMAIL_BODY", "Dzień dobry,\n\nW załączniku znajduje się raport.")
+
+    if not SENDER_EMAIL or not SENDER_PASSWORD:
+        print("Błąd: Skonfiguruj e-mail i hasło nadawcy w ustawieniach aplikacji!")
+        return False
 
     if not os.path.exists(attachment_path):
         print(f"Błąd: Plik {attachment_path} nie istnieje!")
@@ -18,19 +66,21 @@ def send_report_email(receiver_email, attachment_path):
     msg = MIMEMultipart()
     msg["From"] = SENDER_EMAIL
     msg["To"] = receiver_email
-    msg["Subject"] = "Zbiorczy raport rozliczeniowy Audio Opus"
+    msg["Subject"] = EMAIL_SUBJECT
 
-    body = """
+    formatted_body = EMAIL_BODY_RAW.replace('\n', '<br>')
+
+    body_html = f"""
     <html>
-        <body>
-            <p>Dzień dobry,</p>
-            <p>W załączniku znajduje się aktualny raport rozliczeniowy wygenerowany przez system <b>Audio Opus</b>.</p>
+        <body style="font-family: Arial, sans-serif; font-size: 14px;">
+            {formatted_body}
         </body>
     </html>
     """
-    msg.attach(MIMEText(body, "html"))
+    msg.attach(MIMEText(body_html, "html"))
 
     file_name = os.path.basename(attachment_path)
+
     try:
         with open(attachment_path, "rb") as f:
             attachment = MIMEApplication(f.read(), _subtype="octet-stream")
@@ -52,8 +102,6 @@ def send_report_email(receiver_email, attachment_path):
     except Exception as e:
         print(f"Błąd podczas wysyłania maila: {e}")
         return False
-    
-
 """
 
 if __name__ == "__main__":
