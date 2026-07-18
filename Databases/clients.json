@@ -3,18 +3,33 @@
         "cut": "0",
         "email": "",
         "id": 1,
-        "name": "wdadwad"
+        "name": "new client",
+        "products": [
+            1,
+            2,
+            3
+        ]
     },
     {
         "cut": "0",
         "email": "",
-        "id": 2,
-        "name": "dawawdda"
+        "id": 6,
+        "name": "new client",
+        "products": [
+            1,
+            2
+        ]
     },
     {
+        "cut": "23",
+        "email": "",
+        "id": 7,
         "name": "new client",
-        "cut": 0,
-        "email": null,
-        "id": 3
+        "products": [
+            1,
+            2,
+            3,
+            4
+        ]
     }
 ]

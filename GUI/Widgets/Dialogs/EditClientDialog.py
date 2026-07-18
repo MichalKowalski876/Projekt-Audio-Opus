@@ -1,4 +1,4 @@
-from PySide6 import QtWidgets
+from PySide6 import QtWidgets, QtCore
 
 import database_controller
 
@@ -19,13 +19,31 @@ class EditClientDialog(QtWidgets.QDialog):
         self.cut_edit = QtWidgets.QLineEdit()
         self.email_edit = QtWidgets.QLineEdit()
 
+        self.books_list = QtWidgets.QListWidget()
+
+        books = database_controller.load_database("products")
+
+        for book in books:
+            item = QtWidgets.QListWidgetItem(book["name"])
+            item.setData(QtCore.Qt.ItemDataRole.UserRole, book["id"])
+            item.setFlags(item.flags() | QtCore.Qt.ItemFlag.ItemIsUserCheckable)
+
+            if book["id"] in self.client_data.get("products", []):
+                item.setCheckState(QtCore.Qt.CheckState.Checked)
+            else:
+                item.setCheckState(QtCore.Qt.CheckState.Unchecked)
+
+            self.books_list.addItem(item)
+
         self.name_edit.setText(str(self.client_data["name"]))
         self.cut_edit.setText(str(self.client_data["cut"]))
         self.email_edit.setText(self.client_data.get("email", ""))
 
+
         layout.addRow("Name:", self.name_edit)
         layout.addRow("Cut:", self.cut_edit)
         layout.addRow("Email:", self.email_edit)
+        layout.addRow("Books:", self.books_list)
 
         buttons = QtWidgets.QDialogButtonBox(
             QtWidgets.QDialogButtonBox.StandardButton.Save |
@@ -42,6 +60,16 @@ class EditClientDialog(QtWidgets.QDialog):
         self.client_data["cut"] = self.cut_edit.text()
         self.client_data["email"] = self.email_edit.text()
 
+        selected_books = []
+
+        for i in range(self.books_list.count()):
+            item = self.books_list.item(i)
+
+            if item.checkState() == QtCore.Qt.CheckState.Checked:
+                selected_books.append(item.data(QtCore.Qt.ItemDataRole.UserRole))
+
+        self.client_data["products"] = selected_books
+
         database = database_controller.load_database("clients")
 
         for index, client in enumerate(database):
@@ -52,5 +80,4 @@ class EditClientDialog(QtWidgets.QDialog):
         database_controller.save_database("clients", database)
 
         self.refresh_callback()
-
         self.accept()

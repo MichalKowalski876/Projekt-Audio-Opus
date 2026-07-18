@@ -1,9 +1,7 @@
 from PySide6 import QtWidgets, QtCore
-
 from PySide6.QtWidgets import QHeaderView
 
 from GUI.Widgets.CrudTable.NumericDelegate import NumericDelegate
-
 import database_controller
 
 
@@ -16,7 +14,6 @@ class Table(QtWidgets.QWidget):
 
         self.data = []
         self.item_id = None
-        self.client_id = None
 
         self.label = QtWidgets.QLabel(database_name.capitalize())
 
@@ -28,22 +25,20 @@ class Table(QtWidgets.QWidget):
 
         if "Cut" in self.table_header:
             column = self.table_header.index("Cut")
-            self.table.setItemDelegateForColumn(column, NumericDelegate(float, self.table))
-
-        self.refresh_table()
+            self.table.setItemDelegateForColumn(
+                column,
+                NumericDelegate(float, self.table)
+            )
 
         if self.database_name == "products":
             header = self.table.horizontalHeader()
-            header.setSectionResizeMode(0, QHeaderView.ResizeToContents)  # Id
-            header.setSectionResizeMode(1, QHeaderView.Stretch)  # Name
+            header.setSectionResizeMode(0, QHeaderView.ResizeToContents)
+            header.setSectionResizeMode(1, QHeaderView.Stretch)
 
         self.table.itemChanged.connect(self.on_item_changed)
         self.table.cellClicked.connect(self.on_item_clicked)
 
         self.setup_layout()
-    def set_client_id(self, client_id: int):
-        self.client_id = client_id
-        self.item_id = None
         self.refresh_table()
 
     def on_item_changed(self, item):
@@ -62,16 +57,6 @@ class Table(QtWidgets.QWidget):
 
     def refresh_table(self):
         self.data = database_controller.load_database(self.database_name)
-
-        if self.database_name == "products":
-            if self.client_id is None:
-                self.data = []
-            else:
-                self.data = [
-                    item
-                    for item in self.data
-                    if item.get("client_id") == self.client_id
-                ]
 
         self.table.blockSignals(True)
         self.table.setRowCount(len(self.data))
