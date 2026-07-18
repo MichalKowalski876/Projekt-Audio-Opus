@@ -1,7 +1,7 @@
 from PySide6 import QtWidgets
 
-from GUI.Widgets.Buttons.AddTableButton import AddTableButton
-from GUI.Widgets.Buttons.RemoveTableButton import RemoveTableButton
+from GUI.Widgets.Buttons.Table.AddTableButton import AddTableButton
+from GUI.Widgets.Buttons.Table.RemoveTableButton import RemoveTableButton
 from GUI.Widgets.CrudTable.Table import Table
 
 

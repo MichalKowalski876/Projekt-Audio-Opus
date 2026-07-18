@@ -1,20 +1,20 @@
 [
     {
+        "cut": "0",
+        "email": "",
         "id": 1,
-        "name": "test1",
-        "email": "test1@example.com",
-        "cut": "12"
+        "name": "wdadwad"
     },
     {
+        "cut": "0",
+        "email": "",
         "id": 2,
-        "name": "test2",
-        "email": "test2@example.com",
-        "cut": "32"
+        "name": "dawawdda"
     },
     {
-        "id": 3,
-        "name": "test3",
-        "email": "test3@example.com",
-        "cut": "2"
+        "name": "new client",
+        "cut": 0,
+        "email": null,
+        "id": 3
     }
 ]

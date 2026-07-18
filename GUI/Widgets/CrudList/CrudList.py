@@ -1,15 +1,16 @@
 from PySide6 import QtWidgets, QtCore
 
-from GUI.Widgets.Buttons.AddListButton import AddListButton
-from GUI.Widgets.Buttons.RemoveListButton import RemoveListButton
+from GUI.Widgets.Buttons.List.EditItemListButton import EditItemListButton
+from GUI.Widgets.Buttons.List.AddListButton import AddListButton
+from GUI.Widgets.Buttons.List.RemoveListButton import RemoveListButton
 from GUI.Widgets.CrudList.List import List
-from GUI.Widgets.Buttons.AddTableButton import AddTableButton
+from GUI.Widgets.Dialogs.EditClientDialog import EditClientDialog
 
 
 class CrudList(QtWidgets.QWidget):
     def __init__(self, database_name):
         super().__init__()
-
+        self.current_client = None
         self.list = List(database_name)
 
         self.details = QtWidgets.QWidget()
@@ -17,20 +18,25 @@ class CrudList(QtWidgets.QWidget):
 
         details_layout = QtWidgets.QFormLayout(self.details)
 
-        self.id_label = QtWidgets.QLabel("-")
-        self.name_edit = QtWidgets.QLineEdit()
-        self.cut_edit = QtWidgets.QLineEdit()
-        self.email_edit = QtWidgets.QLineEdit()
-
-        details_layout.addRow("Id:", self.id_label)
-        details_layout.addRow("Name:", self.name_edit)
-        details_layout.addRow("Cut:", self.cut_edit)
-        details_layout.addRow("Email:", self.email_edit)
+        self.id_label = QtWidgets.QLabel()
+        self.name_label = QtWidgets.QLabel()
+        self.cut_label = QtWidgets.QLabel()
+        self.email_label = QtWidgets.QLabel()
 
         self.add_button = AddListButton(database_name, self.list.refresh_list)
         self.remove_button = RemoveListButton(database_name, self.list, self.list.refresh_list)
+        self.edit_button = EditItemListButton()
+        self.edit_button.selected.connect(self.open_edit_window)
 
-        self.list.selected.connect(self.show_details)
+        details_layout.addRow("Id:", self.id_label)
+        details_layout.addRow("Name:", self.name_label)
+        details_layout.addRow("Cut:", self.cut_label)
+        details_layout.addRow("Email:", self.email_label)
+        details_layout.addWidget(self.edit_button)
+
+        self.edit_button.hide()
+
+        self.list.selected.connect(self.on_selected_item)
 
         left_layout = QtWidgets.QVBoxLayout()
         left_layout.addWidget(self.list)
@@ -56,14 +62,21 @@ class CrudList(QtWidgets.QWidget):
             self.remove_button,
             QtCore.Qt.AlignmentFlag.AlignBottom
         )
+    def on_selected_item(self, data):
+        self.current_client = data
 
+        self.edit_button.show()
 
-
-
-
-
-    def show_details(self, data):
         self.id_label.setText(str(data["id"]))
-        self.name_edit.setText(data["name"])
-        self.cut_edit.setText(str(data["cut"]))
-        self.email_edit.setText(data.get("email", ""))
+        self.name_label.setText(data["name"])
+        self.cut_label.setText(str(data["cut"]))
+        self.email_label.setText(data.get("email", ""))
+
+    def open_edit_window(self):
+        if self.current_client is None:
+            return
+
+        dialog = EditClientDialog(self.current_client, self.list.refresh_list)
+
+        if dialog.exec():
+            self.on_selected_item(self.current_client)

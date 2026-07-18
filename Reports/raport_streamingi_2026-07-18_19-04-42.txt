@@ -1,0 +1,13 @@
+RAPORT PLATFORM STREAMINGOWYCH - Projekt Audio Opus
+Wygenerowano: 2026-07-18 19:04:42
+Liczba platform: 2
+==================================================
+
+Id:       1
+Nazwa:    Legimi
+Prowizja: 12%
+--------------------------------------------------
+Id:       2
+Nazwa:    Spotify
+Prowizja: 32%
+--------------------------------------------------
