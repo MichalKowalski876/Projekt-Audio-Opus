@@ -5,7 +5,7 @@ from PySide6 import QtWidgets, QtGui
 import database_controller
 
 
-class AddButton(QtWidgets.QPushButton):
+class AddTableButton(QtWidgets.QPushButton):
     def __init__(
             self,
             fields: list[str],

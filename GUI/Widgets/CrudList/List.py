@@ -34,6 +34,8 @@ class List(QtWidgets.QWidget):
 
     def on_item_clicked(self, item):
         data = item.data(QtCore.Qt.ItemDataRole.UserRole)
+
+        self.item_id = data["id"]
         self.selected.emit(data)
 
     def setup_layout(self):

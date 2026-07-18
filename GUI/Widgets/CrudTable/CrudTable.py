@@ -1,7 +1,7 @@
 from PySide6 import QtWidgets
 
-from GUI.Widgets.CrudTable.CrudButton.AddButton import AddButton
-from GUI.Widgets.CrudTable.CrudButton.RemoveButton import RemoveButton
+from GUI.Widgets.Buttons.AddTableButton import AddTableButton
+from GUI.Widgets.Buttons.RemoveTableButton import RemoveTableButton
 from GUI.Widgets.CrudTable.Table import Table
 
 
@@ -17,7 +17,7 @@ class CrudTable(QtWidgets.QWidget):
 
         self.table = Table(table_header, database_name)
 
-        self.add_button = AddButton(
+        self.add_button = AddTableButton(
             table_header[1:],
             database_name,
             self.table.refresh_table,
@@ -25,7 +25,7 @@ class CrudTable(QtWidgets.QWidget):
             field_types
         )
 
-        self.remove_button = RemoveButton(
+        self.remove_button = RemoveTableButton(
             database_name,
             self.table,
             self.table.refresh_table
