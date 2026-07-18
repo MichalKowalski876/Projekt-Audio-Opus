@@ -5,8 +5,9 @@ from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-SMTP_CONFIG_FILE = "smtp_config.json"
-MSG_CONFIG_FILE = "msg_config.json"
+DB_DIR = "Databases"
+SMTP_CONFIG_FILE = os.path.join(DB_DIR, "smtp_config.json")
+MSG_CONFIG_FILE = os.path.join(DB_DIR, "msg_config.json")
 
 
 def load_smtp_config():
