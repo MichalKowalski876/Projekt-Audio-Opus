@@ -4,8 +4,9 @@ from PySide6 import QtWidgets, QtCore
 import email_sender
 import report_generator
 
-SMTP_CONFIG_FILE = "smtp_config.json"
-MSG_CONFIG_FILE = "msg_config.json"
+DB_DIR = "Databases"
+SMTP_CONFIG_FILE = os.path.join(DB_DIR, "smtp_config.json")
+MSG_CONFIG_FILE = os.path.join(DB_DIR, "msg_config.json")
 
 
 class SettingsDialog(QtWidgets.QDialog):
