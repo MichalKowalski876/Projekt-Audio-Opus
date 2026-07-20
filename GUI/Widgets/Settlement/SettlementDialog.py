@@ -8,10 +8,14 @@ class SettlementDialog(QtWidgets.QDialog):
     """Dialog rozliczeniowy:
     wybór klienta -> produkt + platforma + wypłata -> raport PDF.
     """
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, email_mode=False):
         super().__init__(parent)
 
-        self.setWindowTitle("Nowe rozliczenie")
+        self.email_mode = email_mode
+        if self.email_mode:
+            self.setWindowTitle("Wybór danych do wiadomości e-mail")
+        else:
+            self.setWindowTitle("Nowe rozliczenie")
         self.resize(600, 500)
 
         self.clients = database_controller.load_database("clients")
@@ -38,7 +42,11 @@ class SettlementDialog(QtWidgets.QDialog):
 
         self.table.horizontalHeader().setStretchLastSection(True)
 
-        self.generate_button = QtWidgets.QPushButton("Generuj raport PDF")
+        if self.email_mode:
+            self.generate_button = QtWidgets.QPushButton("Generuj PDF i załącz do e-maila")
+        else:
+            self.generate_button = QtWidgets.QPushButton("Generuj raport PDF")
+
         self.generate_button.clicked.connect(self.generate_report)
 
         self.setup_layout()
@@ -135,11 +143,15 @@ class SettlementDialog(QtWidgets.QDialog):
 
         try:
             file_path = report_generator.generate_settlement_pdf(client, items)
+            self.generated_file_path = file_path
         except ValueError:
             QtWidgets.QMessageBox.warning(self, "Uwaga", "Prowizja klienta i platformy musi być liczbą.")
             return
 
-        QtWidgets.QMessageBox.information(self, "Gotowe", f"Zapisano raport:\n{file_path}")
+            # 5. BLOKUJEMY WYSKAKUJĄCY KOMUNIKAT, JEŚLI JESTEŚMY W TRYBIE EMAIL
+        if not self.email_mode:
+            QtWidgets.QMessageBox.information(self, "Gotowe", f"Zapisano raport:\n{file_path}")
+
         self.accept()
 
     def setup_layout(self):
