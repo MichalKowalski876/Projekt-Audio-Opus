@@ -148,7 +148,6 @@ class SettlementDialog(QtWidgets.QDialog):
             QtWidgets.QMessageBox.warning(self, "Uwaga", "Prowizja klienta i platformy musi być liczbą.")
             return
 
-            # 5. BLOKUJEMY WYSKAKUJĄCY KOMUNIKAT, JEŚLI JESTEŚMY W TRYBIE EMAIL
         if not self.email_mode:
             QtWidgets.QMessageBox.information(self, "Gotowe", f"Zapisano raport:\n{file_path}")
 
