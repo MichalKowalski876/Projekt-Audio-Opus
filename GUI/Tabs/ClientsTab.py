@@ -34,7 +34,3 @@ class ClientsTab(QtWidgets.QWidget):
     def on_client_selected(self, client):
         client_id = client["id"]
 
-        self.productTable.table.label.setText(
-        f"Books: {client['name']}"
-    )
-

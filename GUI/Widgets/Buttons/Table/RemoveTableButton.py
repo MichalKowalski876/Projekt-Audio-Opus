@@ -22,6 +22,19 @@ class RemoveTableButton(QtWidgets.QPushButton):
             )
             return
 
+        if self.database_name == "products":
+            clients = database_controller.load_database("clients")
+
+            for client in clients:
+                if self.table.item_id in client.get("products", []):
+                    QtWidgets.QMessageBox.warning(
+                        self,
+                        "Warning",
+                        "This product is assigned to a client.\n"
+                        "Remove it from all clients before deleting it."
+                    )
+                    return
+
         database_controller.item_remove(
             self.table.item_id,
             self.database_name
@@ -29,3 +42,4 @@ class RemoveTableButton(QtWidgets.QPushButton):
 
         self.table.item_id = None
         self.refresh_callback()
+
