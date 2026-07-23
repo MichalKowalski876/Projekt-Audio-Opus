@@ -38,3 +38,6 @@ class CrudTable(QtWidgets.QWidget):
         layout = QtWidgets.QVBoxLayout(self)
         layout.addWidget(self.table)
         layout.addLayout(buttons_layout)
+
+    def search(self, text):
+        self.table.search(text)

@@ -86,3 +86,33 @@ class Table(QtWidgets.QWidget):
         )
 
         layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
+
+    def search(self, text: str):
+        text = text.lower()
+
+        self.table.blockSignals(True)
+
+        if not text:
+            self.refresh_table()
+            self.table.blockSignals(False)
+            return
+
+        self.table.setRowCount(0)
+
+        for item in self.data:
+            if any(
+                    text in str(value).lower()
+                    for value in item.values()
+            ):
+                row = self.table.rowCount()
+                self.table.insertRow(row)
+
+                for column, header in enumerate(self.table_header):
+                    value = item.get(header.lower(), "")
+                    self.table.setItem(
+                        row,
+                        column,
+                        QtWidgets.QTableWidgetItem(str(value))
+                    )
+
+        self.table.blockSignals(False)
