@@ -86,7 +86,7 @@ class CrudClientList(QtWidgets.QWidget):
             )
 
             if product is not None:
-                books_list_text += f"{index + 1}. {product['name']}\n"
+                books_list_text += f"{index + 1}. {product['title']}\n"
 
         self.books_list.setText(books_list_text)
 

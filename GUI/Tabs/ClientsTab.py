@@ -12,7 +12,6 @@ class ClientsTab(QtWidgets.QWidget):
         super().__init__()
 
         self.list = CrudClientList("clients")
-        self.productTable = CrudTable(["Id", "Name"], "products")
 
         self.list.list.selected.connect(
         self.on_client_selected
@@ -20,16 +19,7 @@ class ClientsTab(QtWidgets.QWidget):
 
         layout = QtWidgets.QHBoxLayout(self)
         layout.addWidget(self.list)
-        layout.addWidget(self.productTable)
 
-    def show_products(self, product_ids):
-        all_products = database_controller.load_database("products")
-
-        self.data = [
-            product
-            for product in all_products
-            if product["id"] in product_ids
-        ]
 
     def on_client_selected(self, client):
         client_id = client["id"]

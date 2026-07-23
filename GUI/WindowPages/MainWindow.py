@@ -2,6 +2,7 @@ from PySide6 import QtWidgets, QtCore
 from PySide6 import QtWidgets
 
 from GUI.Tabs.ClientsTab import ClientsTab
+from GUI.Tabs.ProductsTab import ProductsTab
 from GUI.Tabs.StreamingTab import StreamingTab
 from GUI.Tabs.ReportTab import ReportTab
 
@@ -15,6 +16,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.tabs = QtWidgets.QTabWidget()
 
         self.tabs.addTab(ClientsTab(), "Clients")
+        self.tabs.addTab(ProductsTab(), "Products")
         self.tabs.addTab(StreamingTab(), "Streaming")
         self.tabs.addTab(ReportTab(), "Report on E-mail")
 

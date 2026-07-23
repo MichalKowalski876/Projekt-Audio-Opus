@@ -1,27 +1,11 @@
 [
     {
-        "cut": "80",
-        "email": "audioopus@gmail.com",
+        "cut": "0",
+        "email": "",
         "id": 1,
-        "name": "yep",
-        "products": []
-    },
-    {
-        "cut": "0",
-        "email": "",
-        "id": 2,
         "name": "new client",
         "products": [
-            3
-        ]
-    },
-    {
-        "cut": "0",
-        "email": "",
-        "id": 3,
-        "name": "new client",
-        "products": [
-            3
+            1
         ]
     }
 ]

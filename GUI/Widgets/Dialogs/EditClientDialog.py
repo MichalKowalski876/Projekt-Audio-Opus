@@ -24,7 +24,7 @@ class EditClientDialog(QtWidgets.QDialog):
         books = database_controller.load_database("products")
 
         for book in books:
-            item = QtWidgets.QListWidgetItem(book["name"])
+            item = QtWidgets.QListWidgetItem(book["title"])
             item.setData(QtCore.Qt.ItemDataRole.UserRole, book["id"])
             item.setFlags(item.flags() | QtCore.Qt.ItemFlag.ItemIsUserCheckable)
 
