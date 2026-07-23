@@ -6,6 +6,7 @@ from pathlib import Path
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from Databases.email_log import log_send
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -60,11 +61,14 @@ def send_report_email(receiver_email: str, attachment_path: str | Path) -> bool:
 
     if not sender_email or not sender_password:
         logging.error("Brak danych logowania nadawcy! Ustaw e-mail i hasło w środowisku lub configu.")
+        log_send(receiver_email, attachment_path.name, "error", "Brak danych logowania nadawcy")
         return False
 
     if not attachment_path.exists():
         logging.error(f"Plik załącznika {attachment_path} nie istnieje!")
+        log_send(receiver_email, attachment_path.name, "error", "Plik załącznika nie istnieje")
         return False
+
     msg = MIMEMultipart("mixed")
     msg["From"] = sender_email
     msg["To"] = receiver_email
@@ -87,6 +91,7 @@ def send_report_email(receiver_email: str, attachment_path: str | Path) -> bool:
     body_part.attach(part_text)
     body_part.attach(part_html)
     msg.attach(body_part)
+
     try:
         with attachment_path.open("rb") as f:
             attachment = MIMEApplication(f.read(), _subtype="octet-stream")
@@ -94,7 +99,9 @@ def send_report_email(receiver_email: str, attachment_path: str | Path) -> bool:
             msg.attach(attachment)
     except Exception as e:
         logging.error(f"Błąd podczas pakowania załącznika: {e}")
+        log_send(receiver_email, attachment_path.name, "error", f"Błąd pakowania załącznika: {e}")
         return False
+
     try:
         logging.info(f"Łączenie z serwerem SMTP ({server_host}:{server_port})...")
         with smtplib.SMTP_SSL(server_host, server_port) as server:
@@ -102,14 +109,17 @@ def send_report_email(receiver_email: str, attachment_path: str | Path) -> bool:
             server.send_message(msg)
 
         logging.info(f"E-mail został pomyślnie wysłany na {receiver_email}.")
+        log_send(receiver_email, attachment_path.name, "success")
         return True
 
     except smtplib.SMTPAuthenticationError:
         logging.error(
             "Błąd uwierzytelniania: nieprawidłowy e-mail lub hasło. Sprawdź, czy nie potrzebujesz 'Hasła aplikacji' (App Password).")
+        log_send(receiver_email, attachment_path.name, "error", "Błąd uwierzytelniania SMTP")
         return False
     except Exception as e:
         logging.error(f"Błąd połączenia / wysyłania e-maila: {e}")
+        log_send(receiver_email, attachment_path.name, "error", str(e))
         return False
 
 
